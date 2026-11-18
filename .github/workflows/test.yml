@@ -1,0 +1,49 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  dotnet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Unit tests
+        run: dotnet test dotnet/McpPostgres.Tests/McpPostgres.Tests.csproj -c Release --filter "FullyQualifiedName!~IntegrationTests"
+
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: McpPostgres_Test123!
+          POSTGRES_DB: mcp_test
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d mcp_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Integration tests
+        env:
+          MCP_POSTGRES_TEST_CONNECTION_STRING: Host=localhost;Port=5432;Username=postgres;Password=McpPostgres_Test123!;Database=mcp_test;Ssl Mode=Disable
+        run: dotnet test dotnet/McpPostgres.Tests/McpPostgres.Tests.csproj -c Release --filter "FullyQualifiedName~IntegrationTests"

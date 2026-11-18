@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "postgres-hml": {
+      "command": "dotnet",
+      "args": ["dnx", "McpPostgres", "--yes", "--source", "https://api.nuget.org/v3/index.json"],
+      "env": {
+        "MCP_POSTGRES_CONNECTION_STRING": "Host=pg-hml;Port=5432;Username=leitura;Password=SUA_SENHA;Database=postgres;SSL Mode=Require",
+        "PG_READONLY": "true"
+      }
+    }
+  }
+}

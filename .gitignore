@@ -1,0 +1,6 @@
+*.log
+.env
+.qodo/
+nupkg/
+**/bin/
+**/obj/
